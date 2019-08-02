@@ -56,4 +56,10 @@ public:
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+private:
+	void SetupCamera();
+	void SetupCamSpringArm();
+	void SetupControls();
+	void SetupCharacterComponent();
 };

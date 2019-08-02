@@ -3,9 +3,11 @@
 #include "MainCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Components/InputComponent.h"
+#include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AMainCharacter::AMainCharacter()
@@ -13,17 +15,10 @@ AMainCharacter::AMainCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(GetRootComponent());
-	CameraBoom->TargetArmLength = 600.f;
-	CameraBoom->bUsePawnControlRotation = true;	// Rotate arm based off Pawn controller
-
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	FollowCamera->bUsePawnControlRotation = false;
-
-	BaseTurnRate = 65.f;
-	BaseLookUpRate = 65.f;
+	SetupCamSpringArm();
+	SetupCamera();
+	SetupControls();
+	SetupCharacterComponent();
 }
 
 // Called when the game starts or when spawned
@@ -76,6 +71,7 @@ void AMainCharacter::MoveForward(float dir)
 		const FVector facingDir = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::X);
 		
 		AddMovementInput(facingDir, dir);
+		
 	}
 }
 
@@ -105,4 +101,40 @@ void AMainCharacter::LookUpAtRate(float rate)
 	AddControllerPitchInput(rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
+void AMainCharacter::SetupCamera()
+{
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	FollowCamera->bUsePawnControlRotation = false;
+}
+
+void AMainCharacter::SetupCamSpringArm()
+{
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom->SetupAttachment(GetRootComponent());
+	CameraBoom->TargetArmLength = 600.f;
+	CameraBoom->bUsePawnControlRotation = true;	// Rotate arm based off Pawn controller
+}
+
+void AMainCharacter::SetupControls()
+{
+	BaseTurnRate = 65.f;
+	BaseLookUpRate = 65.f;
+
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationPitch = false;
+}
+
+void AMainCharacter::SetupCharacterComponent()
+{
+	// Set size for collision capsule
+	GetCapsuleComponent()->SetCapsuleSize(34.f, 88.f);
+
+	// Character will automatically turn towards movement direction
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);	// Yaw is defined so only the Yaw is used for rotating orientation
+	GetCharacterMovement()->JumpZVelocity = 650.f;
+	GetCharacterMovement()->AirControl = 0.25f;
+}
 
