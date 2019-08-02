@@ -134,7 +134,7 @@ void AMainCharacter::SetupCharacterComponent()
 	// Character will automatically turn towards movement direction
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);	// Yaw is defined so only the Yaw is used for rotating orientation
-	GetCharacterMovement()->JumpZVelocity = 650.f;
+	GetCharacterMovement()->JumpZVelocity = 450.f;
 	GetCharacterMovement()->AirControl = 0.25f;
 }
 
