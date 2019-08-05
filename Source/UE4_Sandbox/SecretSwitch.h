@@ -33,6 +33,13 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = SecretSwitch)
 	FVector InitialSwitchLocation;
 
+	FTimerHandle SwitchHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SecretSwitch)
+	float SwitchDeactivationTime;
+
+	bool bPlayerOnSwitch;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -46,6 +53,8 @@ public:
 
 	UFUNCTION()	// must be a UFUNCTION to act as a delegate
 	void OnTriggerDeactivated(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndext);
+
+	void BeginTargetDeactivation();
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = SecretSwitch)
 	void ActivateTarget();

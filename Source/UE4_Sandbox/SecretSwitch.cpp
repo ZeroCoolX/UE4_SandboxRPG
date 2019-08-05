@@ -3,6 +3,7 @@
 #include "SecretSwitch.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "TimerManager.h"
 
 // Sets default values
 ASecretSwitch::ASecretSwitch()
@@ -26,6 +27,9 @@ ASecretSwitch::ASecretSwitch()
 
 	ActivatedTarget = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ActivatedTarget"));
 	ActivatedTarget->SetupAttachment(GetRootComponent());
+
+	SwitchDeactivationTime = 2.f;
+	bPlayerOnSwitch = false;
 }
 
 // Called when the game starts or when spawned
@@ -51,6 +55,7 @@ void ASecretSwitch::Tick(float DeltaTime)
 void ASecretSwitch::OnTriggerActivated(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Trigger Activated..."));
+	bPlayerOnSwitch = true;
 	ActivateTarget();
 	ActivateSwitch();
 }
@@ -58,8 +63,16 @@ void ASecretSwitch::OnTriggerActivated(UPrimitiveComponent* OverlappedComponent,
 void ASecretSwitch::OnTriggerDeactivated(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndext)
 {
 	UE_LOG(LogTemp, Warning, TEXT("...Trigger Deactivated"));
-	DeactivateTarget();
-	DeactivateSwitch();
+	bPlayerOnSwitch = false;
+	GetWorldTimerManager().SetTimer(SwitchHandle, this, &ASecretSwitch::BeginTargetDeactivation, SwitchDeactivationTime);
+}
+
+void ASecretSwitch::BeginTargetDeactivation()
+{
+	if (!bPlayerOnSwitch) {
+		DeactivateTarget();
+		DeactivateSwitch();
+	}
 }
 
 void ASecretSwitch::UpdateTargetLocation(float z)
