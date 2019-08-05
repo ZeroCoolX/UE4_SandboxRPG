@@ -36,6 +36,9 @@ void ASecretSwitch::BeginPlay()
 	// Overlap delegates setup
 	TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ASecretSwitch::OnTriggerActivated);
 	TriggerBox->OnComponentEndOverlap.AddDynamic(this, &ASecretSwitch::OnTriggerDeactivated);
+
+	InitialTargetLocation = ActivatedTarget->GetComponentLocation();
+	InitialSwitchLocation = PhysicalSwitch->GetComponentLocation();
 }
 
 // Called every frame
@@ -48,10 +51,28 @@ void ASecretSwitch::Tick(float DeltaTime)
 void ASecretSwitch::OnTriggerActivated(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Trigger Activated..."));
+	ActivateTarget();
+	ActivateSwitch();
 }
 
 void ASecretSwitch::OnTriggerDeactivated(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndext)
 {
 	UE_LOG(LogTemp, Warning, TEXT("...Trigger Deactivated"));
+	DeactivateTarget();
+	DeactivateSwitch();
+}
+
+void ASecretSwitch::UpdateTargetLocation(float z)
+{
+	FVector newLocation = InitialTargetLocation;
+	newLocation.Z += z;
+	ActivatedTarget->SetWorldLocation(newLocation);
+}
+
+void ASecretSwitch::UpdateSwitchLocation(float z)
+{
+	FVector newLocation = InitialSwitchLocation;
+	newLocation.Z += z;
+	PhysicalSwitch->SetWorldLocation(newLocation);
 }
 

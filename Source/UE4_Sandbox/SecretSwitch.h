@@ -27,6 +27,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SecretSwitch)
 	UStaticMeshComponent* ActivatedTarget;
 
+	UPROPERTY(BlueprintReadWrite, Category = SecretSwitch)
+	FVector InitialTargetLocation;
+
+	UPROPERTY(BlueprintReadWrite, Category = SecretSwitch)
+	FVector InitialSwitchLocation;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -41,4 +47,21 @@ public:
 	UFUNCTION()	// must be a UFUNCTION to act as a delegate
 	void OnTriggerDeactivated(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndext);
 	
+	UFUNCTION(BlueprintImplementableEvent, Category = SecretSwitch)
+	void ActivateTarget();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = SecretSwitch)
+	void DeactivateTarget();
+
+	UFUNCTION(BlueprintCallable, Category = SecretSwitch)
+	void UpdateTargetLocation(float z);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = SecretSwitch)
+	void ActivateSwitch();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = SecretSwitch)
+	void DeactivateSwitch();
+
+	UFUNCTION(BlueprintCallable, Category = SecretSwitch)
+	void UpdateSwitchLocation(float z);
 };
